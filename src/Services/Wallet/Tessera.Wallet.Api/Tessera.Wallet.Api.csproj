@@ -10,4 +10,8 @@
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Tessera.ServiceDefaults\Tessera.ServiceDefaults.csproj" />
+  </ItemGroup>
+
 </Project>
