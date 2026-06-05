@@ -4,9 +4,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.ServiceDiscovery;
+
 using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
+
+using Serilog;
 
 namespace Microsoft.Extensions.Hosting;
 
@@ -20,9 +23,10 @@ public static class Extensions
 
     public static TBuilder AddServiceDefaults<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
     {
-        builder.ConfigureOpenTelemetry();
-
-        builder.AddDefaultHealthChecks();
+        builder.ConfigureOpenTelemetry()
+            .AddSerilogLogging()
+            .AddDefaultHealthChecks()
+            .AddKeycloakAuth();
 
         builder.Services.AddServiceDiscovery();
 
@@ -123,5 +127,43 @@ public static class Extensions
         }
 
         return app;
+    }
+
+    public static TBuilder AddSerilogLogging<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
+    {
+        builder.Services.AddSerilog((sp, lc) => lc
+            .ReadFrom.Configuration(builder.Configuration)
+            .ReadFrom.Services(sp)
+            .Enrich.FromLogContext()
+            .Enrich.WithMachineName()
+            .Enrich.WithProperty("service", builder.Environment.ApplicationName)
+            .WriteTo.Console()
+            .WriteTo.OpenTelemetry(o =>
+            {
+                o.Endpoint = builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"];
+            }));
+
+        return builder;
+    }
+
+    public static TBuilder AddKeycloakAuth<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
+    {
+        builder.Services.AddAuthentication()
+            .AddKeycloakJwtBearer(
+            serviceName: "keycloak",
+            realm: "tessera",
+            options =>
+            {
+                options.Audience = "wallet.api";
+
+                // For development only - disable HTTPS metadata validation
+                // In production, use explicit Authority configuration instead
+                if (builder.Environment.IsDevelopment())
+                {
+                    options.RequireHttpsMetadata = false;
+                }
+            });
+
+        return builder;
     }
 }
