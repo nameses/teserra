@@ -11,4 +11,6 @@ public class Wallet
     public uint Xmin { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
+
+    public ICollection<LedgerEntry> Transactions { get; set; } = new List<LedgerEntry>();
 }

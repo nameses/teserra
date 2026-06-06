@@ -13,6 +13,8 @@ builder.Services.AddDbContextPool<WalletDbContext>((sp, opt) =>
        .UseSnakeCaseNamingConvention());
 builder.EnrichNpgsqlDbContext<WalletDbContext>();
 
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

@@ -10,4 +10,6 @@ public class LedgerEntry
     public Guid IdempotencyKey { get; set; }
     public decimal BalanceAfter { get; set; }
     public DateTime CreatedAt { get; set; }
+
+    public Wallet? Wallet { get; set; }
 }
