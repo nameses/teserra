@@ -62,4 +62,19 @@ public static class WalletExtensions
             CreatedAt = DateTime.UtcNow,
         };
     }
+    public static Db.LedgerEntry? Credit(this Db.Wallet wallet, decimal amount, string key, Guid idempotencyKey)
+    {
+        var balanceAfter = wallet.Balance + amount;
+
+        return new Db.LedgerEntry()
+        {
+            WalletId = wallet.Id,
+            Type = Db.OperationType.BetStake,
+            ReferenceId = idempotencyKey,
+            IdempotencyKey = key,
+            BalanceAfter = balanceAfter,
+            Amount = amount,
+            CreatedAt = DateTime.UtcNow,
+        };
+    }
 }
