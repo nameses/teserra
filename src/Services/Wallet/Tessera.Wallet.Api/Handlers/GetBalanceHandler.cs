@@ -1,20 +1,20 @@
 ﻿using MediatR;
-using Microsoft.EntityFrameworkCore;
-using Tessera.Wallet.Api.Db;
+using Tessera.Wallet.Api.Handlers.Models;
+using Tessera.Wallet.Api.Repos;
 
 namespace Tessera.Wallet.Api.Handlers;
 
-public record GetBalanceQuery(Guid PlayerId) : IRequest<decimal>;
+
 
 public class GetBalanceHandler : IRequestHandler<GetBalanceQuery, decimal>
 {
-    private WalletDbContext _db { get; set; }
+    private readonly IWalletRepository _repo;
 
-    public GetBalanceHandler(WalletDbContext db) => _db = db; 
+    public GetBalanceHandler(IWalletRepository repo) => _repo = repo; 
 
     public async Task<decimal> Handle(GetBalanceQuery request, CancellationToken cancellationToken)
     {
-        var wallet = await _db.Wallets.Where(w => w.PlayerId == request.PlayerId).FirstOrDefaultAsync(cancellationToken);
+        var wallet = await _repo.GetAsync(request.PlayerId, cancellationToken);
         return wallet?.Balance ?? 0m;
     }
 }

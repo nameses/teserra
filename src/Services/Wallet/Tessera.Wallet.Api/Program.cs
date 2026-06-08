@@ -1,6 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using Tessera.Wallet.Api;
 using Tessera.Wallet.Api.Db;
+using Tessera.Wallet.Api.Repos;
+using Tessera.Wallet.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
@@ -13,11 +16,19 @@ builder.Services.AddDbContextPool<WalletDbContext>((sp, opt) =>
        .UseSnakeCaseNamingConvention());
 builder.EnrichNpgsqlDbContext<WalletDbContext>();
 
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
+builder.Services.AddMediatR(cfg =>
+{
+    cfg.RegisterServicesFromAssembly(typeof(Program).Assembly);
+    cfg.AddOpenBehavior(typeof(LoggingBehavior<,>));
+    cfg.AddOpenBehavior(typeof(TransactionBehavior<,>));
+});
+
+builder.Services.AddSingleton<IWalletRepository, WalletRepository>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+app.MapApiEndpoints();
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
