@@ -1,13 +1,21 @@
 ﻿using MediatR;
+
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+
+using Tessera.Wallet.Api.Db;
+
 using Db = Tessera.Wallet.Api.Db;
 
 namespace Tessera.Wallet.Api.Repos;
 
 public interface IWalletRepository
 {
+    Task CreateTransactionAsync(LedgerEntry entry, CancellationToken cancellationToken);
+
     Task<bool> TransactionExistsAsync(Guid playerId, string key, CancellationToken cancellationToken);
     Task<Db.Wallet?> GetAsync(Guid playerId, CancellationToken cancellationToken);
+    Task<Db.Wallet?> GetOrCreateAsync(Guid playerId, CancellationToken cancellationToken);
     Task<IEnumerable<Db.LedgerEntry>> GetTransactionsAsync(Guid playerId, CancellationToken cancellationToken);
 }
 
@@ -15,6 +23,11 @@ public class WalletRepository : IWalletRepository
 {
     private Db.WalletDbContext _db { get; set; }
     public WalletRepository(Db.WalletDbContext db) => _db = db;
+
+    public async Task CreateTransactionAsync(LedgerEntry entry, CancellationToken cancellationToken)
+    {
+        await _db.LedgerEntries.AddAsync(entry, cancellationToken);
+    }
 
     public async Task<bool> TransactionExistsAsync(Guid playerId, string key, CancellationToken cancellationToken)
     {
@@ -28,6 +41,25 @@ public class WalletRepository : IWalletRepository
     public async Task<Db.Wallet?> GetAsync(Guid playerId, CancellationToken cancellationToken)
     {
         var wallet = await _db.Wallets.FirstOrDefaultAsync(w => w.PlayerId == playerId, cancellationToken);
+        return wallet;
+    }
+
+    public async Task<Db.Wallet?> GetOrCreateAsync(Guid playerId, CancellationToken cancellationToken)
+    {
+        var wallet = await GetAsync(playerId, cancellationToken);
+        if(wallet == null)
+        {
+            wallet = await createAsync(playerId, cancellationToken);
+        }
+        return wallet;
+    }
+
+    private async Task<Db.Wallet> createAsync(Guid playerId, CancellationToken cancellationToken)
+    {
+        var wallet = new Db.Wallet() { Balance = 0m, CreatedAt = DateTime.UtcNow, PlayerId = playerId };
+
+        await _db.Wallets.AddAsync(wallet, cancellationToken);
+
         return wallet;
     }
 
@@ -51,10 +83,12 @@ public static class WalletExtensions
             return null;
         }
 
+        wallet.Balance = balanceAfter;
+
         return new Db.LedgerEntry()
         {
             WalletId = wallet.Id,
-            Type = Db.OperationType.BetStake,
+            Type = Db.OperationType.Withdrawal,
             ReferenceId = idempotencyKey,
             IdempotencyKey = key,
             BalanceAfter = balanceAfter,
@@ -62,14 +96,16 @@ public static class WalletExtensions
             CreatedAt = DateTime.UtcNow,
         };
     }
-    public static Db.LedgerEntry? Credit(this Db.Wallet wallet, decimal amount, string key, Guid idempotencyKey)
+    public static Db.LedgerEntry Credit(this Db.Wallet wallet, decimal amount, string key, Guid idempotencyKey)
     {
         var balanceAfter = wallet.Balance + amount;
+
+        wallet.Balance = balanceAfter;
 
         return new Db.LedgerEntry()
         {
             WalletId = wallet.Id,
-            Type = Db.OperationType.BetStake,
+            Type = Db.OperationType.Deposit,
             ReferenceId = idempotencyKey,
             IdempotencyKey = key,
             BalanceAfter = balanceAfter,

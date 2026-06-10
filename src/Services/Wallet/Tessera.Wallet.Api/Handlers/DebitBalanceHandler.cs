@@ -22,7 +22,10 @@ public class DebitBalanceHandler : IRequestHandler<DebitBalanceCommand, DebitBal
         if(existingTransaction) return new DebitBalanceResponse.AlreadyApplied(wallet.Balance);
 
         var transaction = wallet.Debit(request.Amount, key, request.IdempotancyKey);
-        
+
+        if(transaction is not null)
+            await _repo.CreateTransactionAsync(transaction, cancellationToken);
+
         return transaction == null 
             ? new DebitBalanceResponse.InsufficientFunds(wallet.Balance, request.Amount) 
             : new DebitBalanceResponse.Ok(transaction.BalanceAfter);

@@ -480,3 +480,7 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+/src/Services/Wallet/Tessera.Wallet.Api/Migrations/20260610170519_v0.1.cs
+/src/Services/Wallet/Tessera.Wallet.Api/appsettings.json
+/src/Services/Wallet/Tessera.Wallet.Api/appsettings.Development.json
+/src/Services/Wallet/Tessera.Wallet.Api/Migrations

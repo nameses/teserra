@@ -8,7 +8,7 @@ using Tessera.Wallet.Api.Handlers.Models;
 
 namespace Tessera.Wallet.Api.Services;
 
-public class LoggingBehavior<TReq, TRes> : IPipelineBehavior<TReq, TRes> where TReq : ICommand<TRes>
+public class LoggingBehavior<TReq, TRes> : IPipelineBehavior<TReq, TRes> where TReq : class
 {
     public async Task<TRes> Handle(TReq req, RequestHandlerDelegate<TRes> next, CancellationToken ct)
     {
@@ -19,14 +19,16 @@ public class LoggingBehavior<TReq, TRes> : IPipelineBehavior<TReq, TRes> where T
     }
 }
 
-public class TransactionBehavior<TReq, TRes> : IPipelineBehavior<TReq, TRes> where TReq : class
+public class TransactionBehavior<TReq, TRes> : IPipelineBehavior<TReq, TRes> where TReq : ICommand<TRes>
 {
     private readonly WalletDbContext _db;
 
     private static readonly ResiliencePipeline Retry = new ResiliencePipelineBuilder()
         .AddRetry(new RetryStrategyOptions
         {
-            ShouldHandle = new PredicateBuilder().Handle<DbUpdateConcurrencyException>(),
+            ShouldHandle = new PredicateBuilder()
+                .Handle<DbUpdateConcurrencyException>()
+                .Handle<DbUpdateException>(),
             MaxRetryAttempts = 3,
             BackoffType = DelayBackoffType.Exponential,
             UseJitter = true,
@@ -46,20 +48,22 @@ public class TransactionBehavior<TReq, TRes> : IPipelineBehavior<TReq, TRes> whe
     {
         return await Retry.ExecuteAsync(async token =>
         {
-            _db.ChangeTracker.Clear();
+            var strategy = _db.Database.CreateExecutionStrategy();
 
-            await using var tx = await _db.Database.BeginTransactionAsync(token);
-            try
+            return await strategy.ExecuteAsync(async () =>
             {
+                _db.ChangeTracker.Clear();
+
+                await using var tx =
+                    await _db.Database.BeginTransactionAsync(token);
+
                 var result = await next();
+
+                await _db.SaveChangesAsync(ct);
                 await tx.CommitAsync(token);
+
                 return result;
-            }
-            catch
-            {
-                await tx.RollbackAsync(token);
-                throw;
-            }
+            });
         }, ct);
     }
 }

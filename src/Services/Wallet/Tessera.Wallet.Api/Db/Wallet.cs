@@ -4,7 +4,7 @@ namespace Tessera.Wallet.Api.Db;
 
 public class Wallet
 {
-    public required Guid Id { get; set; }
+    public Guid Id { get; set; }
     public required Guid PlayerId { get; set; }
     public required decimal Balance { get; set; }
     [Timestamp]

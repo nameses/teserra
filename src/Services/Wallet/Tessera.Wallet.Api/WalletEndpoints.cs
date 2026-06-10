@@ -11,7 +11,9 @@ public static class WalletEndpointsExtension
     {
         app.MapGet("/wallets/me/balance", async (ClaimsPrincipal user, ISender mediator) =>
         {
-            if (!Guid.TryParse(user.FindFirst("sub")?.Value, out var playerId))
+            var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (!Guid.TryParse(userId, out var playerId))
                 return Results.Unauthorized();
 
             var balance = await mediator.Send(new GetBalanceQuery(playerId));
@@ -21,7 +23,9 @@ public static class WalletEndpointsExtension
 
         app.MapGet("/wallets/me/transactions", async (ClaimsPrincipal user, ISender mediator) =>
         {
-            if (!Guid.TryParse(user.FindFirst("sub")?.Value, out var playerId))
+            var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (!Guid.TryParse(userId, out var playerId))
                 return Results.Unauthorized();
 
             var transactions = await mediator.Send(new GetTransactionsQuery(playerId));
@@ -30,7 +34,9 @@ public static class WalletEndpointsExtension
 
         app.MapPost("/wallets/withdraw", async (DebitBalanceRequest body, ClaimsPrincipal user, ISender mediator, HttpContext http) =>
         {
-            if (!Guid.TryParse(user.FindFirst("sub")?.Value, out var playerId))
+            var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (!Guid.TryParse(userId, out var playerId))
                 return Results.Unauthorized();
 
             if (!http.Request.Headers.TryGetValue("Idempotency-Key", out var hdr)
@@ -50,7 +56,9 @@ public static class WalletEndpointsExtension
 
         app.MapPost("/wallets/deposit", async (CreditBalanceRequest body, ClaimsPrincipal user, ISender mediator, HttpContext http) =>
         {
-            if (!Guid.TryParse(user.FindFirst("sub")?.Value, out var playerId))
+            var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (!Guid.TryParse(userId, out var playerId))
                 return Results.Unauthorized();
 
             if (!http.Request.Headers.TryGetValue("Idempotency-Key", out var hdr)

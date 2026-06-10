@@ -6,7 +6,8 @@ using Tessera.Wallet.Api.Repos;
 using Tessera.Wallet.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddOpenApi();
+var settings = builder.Configuration.Get<ApplicationSettings>();
+Console.WriteLine($"AUDIENCE = '{settings?.Authorization?.Audience}'");
 
 builder.AddServiceDefaults();
 builder.Services.AddProblemDetails();
@@ -23,23 +24,28 @@ builder.Services.AddMediatR(cfg =>
     cfg.AddOpenBehavior(typeof(TransactionBehavior<,>));
 });
 
-builder.Services.AddSingleton<IWalletRepository, WalletRepository>();
+builder.Services.AddScoped<IWalletRepository, WalletRepository>();
+
+builder.AddKeycloakAuth(settings!.Authorization.Audience);
+builder.Services.AddAuthorization();
+
+builder.Services.AddScalar(builder.Configuration);
 
 var app = builder.Build();
+app.UseSerilogRequestLogging();
+app.UseHttpsRedirection();
 
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapDefaultEndpoints();
+app.ConfigureScalar();
 app.MapApiEndpoints();
 
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
-
-    using (var scope = app.Services.CreateScope())
-    {
-        var db = scope.ServiceProvider.GetRequiredService<WalletDbContext>();
-        await db.Database.MigrateAsync();
-    }
+    using var scope = app.Services.CreateScope();
+    var db = scope.ServiceProvider.GetRequiredService<WalletDbContext>();
+    await db.Database.MigrateAsync();
 }
-app.UseHttpsRedirection();
-app.UseSerilogRequestLogging();
-app.MapDefaultEndpoints();
 app.Run();

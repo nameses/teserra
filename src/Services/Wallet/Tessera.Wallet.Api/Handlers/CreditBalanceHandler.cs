@@ -14,15 +14,16 @@ public class CreditBalanceHandler : IRequestHandler<CreditBalanceCommand, Credit
     {
         var key = $"{request.IdempotancyKey}:deposit";
 
-        var wallet = await _repo.GetAsync(request.PlayerId, cancellationToken);
+        var wallet = await _repo.GetOrCreateAsync(request.PlayerId, cancellationToken);
         if (wallet == null) return new CreditBalanceResponse.WalletNotFound();
 
         var existingTransaction = await _repo.TransactionExistsAsync(request.PlayerId, key, cancellationToken);
         if (existingTransaction) return new CreditBalanceResponse.AlreadyApplied(wallet.Balance);
 
         var transaction = wallet.Credit(request.Amount, key, request.IdempotancyKey);
+        await _repo.CreateTransactionAsync(transaction, cancellationToken);
 
-        return new CreditBalanceResponse.Ok(transaction!.BalanceAfter);
+        return new CreditBalanceResponse.Ok(transaction.BalanceAfter);
     }
 }
 

@@ -25,8 +25,7 @@ public static class Extensions
     {
         builder.ConfigureOpenTelemetry()
             .AddSerilogLogging()
-            .AddDefaultHealthChecks()
-            .AddKeycloakAuth();
+            .AddDefaultHealthChecks();
 
         builder.Services.AddServiceDiscovery();
 
@@ -145,25 +144,16 @@ public static class Extensions
 
         return builder;
     }
-
-    public static TBuilder AddKeycloakAuth<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
+    public static TBuilder AddKeycloakAuth<TBuilder>(this TBuilder builder, string audience) where TBuilder : IHostApplicationBuilder
     {
         builder.Services.AddAuthentication()
-            .AddKeycloakJwtBearer(
-            serviceName: "keycloak",
-            realm: "tessera",
-            options =>
+            .AddKeycloakJwtBearer("keycloak", realm: "tessera", options =>
             {
-                options.Audience = "wallet.api";
-
-                // For development only - disable HTTPS metadata validation
-                // In production, use explicit Authority configuration instead
+                options.Audience = audience;
+                options.TokenValidationParameters.ValidAudiences = new[] { audience };
                 if (builder.Environment.IsDevelopment())
-                {
                     options.RequireHttpsMetadata = false;
-                }
             });
-
         return builder;
     }
 }
