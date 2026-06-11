@@ -24,12 +24,14 @@ builder.Services.AddMediatR(cfg =>
     cfg.AddOpenBehavior(typeof(TransactionBehavior<,>));
 });
 
-builder.Services.AddScoped<IWalletRepository, WalletRepository>();
+builder.Services.AddTransient<IWalletRepository, WalletRepository>();
 
 builder.AddKeycloakAuth(settings!.Authorization.Audience);
 builder.Services.AddAuthorization();
 
 builder.Services.AddScalar(builder.Configuration);
+
+builder.Services.AddGrpc();
 
 var app = builder.Build();
 app.UseSerilogRequestLogging();
@@ -41,6 +43,7 @@ app.UseAuthorization();
 app.MapDefaultEndpoints();
 app.ConfigureScalar();
 app.MapApiEndpoints();
+app.MapGrpcService<WalletGrpcService>();
 
 if (app.Environment.IsDevelopment())
 {

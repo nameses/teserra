@@ -5,8 +5,6 @@ using Tessera.Wallet.Api.Repos;
 
 namespace Tessera.Wallet.Api.Handlers;
 
-
-
 public class GetTransactionsHandler : IRequestHandler<GetTransactionsQuery, IEnumerable<LedgerEntry>>
 {
     private readonly IWalletRepository _repo;

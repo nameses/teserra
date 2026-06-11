@@ -4,8 +4,6 @@ using Tessera.Wallet.Api.Repos;
 
 namespace Tessera.Wallet.Api.Handlers;
 
-
-
 public class GetBalanceHandler : IRequestHandler<GetBalanceQuery, decimal>
 {
     private readonly IWalletRepository _repo;

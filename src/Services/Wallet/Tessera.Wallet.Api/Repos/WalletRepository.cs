@@ -1,11 +1,6 @@
 ﻿using MediatR;
-
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-
 using Tessera.Wallet.Api.Db;
-
-using Db = Tessera.Wallet.Api.Db;
 
 namespace Tessera.Wallet.Api.Repos;
 
@@ -16,13 +11,13 @@ public interface IWalletRepository
     Task<bool> TransactionExistsAsync(Guid playerId, string key, CancellationToken cancellationToken);
     Task<Db.Wallet?> GetAsync(Guid playerId, CancellationToken cancellationToken);
     Task<Db.Wallet?> GetOrCreateAsync(Guid playerId, CancellationToken cancellationToken);
-    Task<IEnumerable<Db.LedgerEntry>> GetTransactionsAsync(Guid playerId, CancellationToken cancellationToken);
+    Task<IEnumerable<LedgerEntry>> GetTransactionsAsync(Guid playerId, CancellationToken cancellationToken);
 }
 
 public class WalletRepository : IWalletRepository
 {
     private Db.WalletDbContext _db { get; set; }
-    public WalletRepository(Db.WalletDbContext db) => _db = db;
+    public WalletRepository(WalletDbContext db) => _db = db;
 
     public async Task CreateTransactionAsync(LedgerEntry entry, CancellationToken cancellationToken)
     {
@@ -63,54 +58,11 @@ public class WalletRepository : IWalletRepository
         return wallet;
     }
 
-    public async Task<IEnumerable<Db.LedgerEntry>> GetTransactionsAsync(Guid playerId, CancellationToken cancellationToken)
+    public async Task<IEnumerable<LedgerEntry>> GetTransactionsAsync(Guid playerId, CancellationToken cancellationToken)
     {
         var transactions = await _db.LedgerEntries.Where(le => le.Wallet!.PlayerId == playerId)
             .ToListAsync(cancellationToken);
 
         return transactions;
-    }
-}
-
-public static class WalletExtensions
-{
-    public static Db.LedgerEntry? Debit(this Db.Wallet wallet, decimal amount, string key, Guid idempotencyKey)
-    {
-        var balanceAfter = wallet.Balance - amount;
-
-        if(balanceAfter < 0)
-        {
-            return null;
-        }
-
-        wallet.Balance = balanceAfter;
-
-        return new Db.LedgerEntry()
-        {
-            WalletId = wallet.Id,
-            Type = Db.OperationType.Withdrawal,
-            ReferenceId = idempotencyKey,
-            IdempotencyKey = key,
-            BalanceAfter = balanceAfter,
-            Amount = amount,
-            CreatedAt = DateTime.UtcNow,
-        };
-    }
-    public static Db.LedgerEntry Credit(this Db.Wallet wallet, decimal amount, string key, Guid idempotencyKey)
-    {
-        var balanceAfter = wallet.Balance + amount;
-
-        wallet.Balance = balanceAfter;
-
-        return new Db.LedgerEntry()
-        {
-            WalletId = wallet.Id,
-            Type = Db.OperationType.Deposit,
-            ReferenceId = idempotencyKey,
-            IdempotencyKey = key,
-            BalanceAfter = balanceAfter,
-            Amount = amount,
-            CreatedAt = DateTime.UtcNow,
-        };
     }
 }

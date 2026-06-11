@@ -1,0 +1,46 @@
+syntax="proto3";
+option csharp_namespace = "Tessera.Contracts.Grpc";
+package wallet;
+
+service WalletService
+{
+    rpc DebitForBet (DebitForBetRequest)    returns (WalletReply);
+    rpc CreditPayout(CreditPayoutRequest)   returns (WalletReply);
+    rpc Refund      (RefundRequest)         returns (WalletReply);
+}
+
+message DebitForBetRequest
+{
+    string player_id = 1; 
+    string round_id = 2; 
+    string amount = 3;
+}
+
+message CreditPayoutRequest
+{
+    string player_id = 1; 
+    string round_id = 2; 
+    string amount = 3;
+}
+
+message RefundRequest
+{
+    string player_id = 1; 
+    string round_id = 2; 
+    string amount = 3;
+}
+
+message WalletReply 
+{
+    Outcome outcome = 1; 
+    string balance = 2; 
+}
+
+enum Outcome
+{
+    OUTCOME_UNSPECIFIED = 0;
+    OK                  = 1;
+    INSUFFICIENT_FUNDS  = 2;
+    ALREADY_APPLIED     = 3;
+    WALLET_NOT_FOUND    = 4;
+}
