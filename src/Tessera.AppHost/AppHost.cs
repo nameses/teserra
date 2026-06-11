@@ -13,12 +13,17 @@ var keycloak = builder.AddKeycloak("keycloak", port: 50717)
     .WithOtlpExporter()
     .WithLifetime(ContainerLifetime.Persistent);
 
-builder.AddProject<Projects.Tessera_Wallet_Api>("wallet-api")
+
+var walletApi = builder.AddProject<Projects.Tessera_Wallet_Api>("wallet-api")
     .WithReference(walletDb)
     .WithReference(rabbitmq)
     .WithReference(keycloak)
     .WaitFor(walletDb)
     .WaitFor(rabbitmq)
     .WaitFor(keycloak);
+
+builder.AddProject<Projects.Tessera_Gateway>("gateway")
+    .WithReference(walletApi)
+    .WithExternalHttpEndpoints();
 
 builder.Build().Run();

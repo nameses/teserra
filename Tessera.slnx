@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="src/Tessera.AppHost/Tessera.AppHost.csproj" />
+    <Project Path="src/Tessera.Gateway/Tessera.Gateway.csproj" />
     <Project Path="src/Tessera.ServiceDefaults/Tessera.ServiceDefaults.csproj" />
   </Folder>
   <Folder Name="/src/Services/" />
