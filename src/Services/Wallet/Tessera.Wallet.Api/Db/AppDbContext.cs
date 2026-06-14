@@ -21,7 +21,7 @@ public class WalletDbContext : DbContext
             e.HasMany(x => x.Transactions)
                 .WithOne(x => x.Wallet)
                 .HasForeignKey(x => x.WalletId)
-                .OnDelete(DeleteBehavior.Restrict); ;
+                .OnDelete(DeleteBehavior.Restrict);
         });
 
         b.Entity<LedgerEntry>(e =>

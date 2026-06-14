@@ -4,6 +4,8 @@ var postgres = builder.AddPostgres("postgres")
     .WithDataVolume()
     .WithLifetime(ContainerLifetime.Persistent);
 var walletDb = postgres.AddDatabase("walletdb");
+var orchestratordb = postgres.AddDatabase("orchestratordb");
+var historyDb = postgres.AddDatabase("historydb");
 
 var rabbitmq = builder.AddRabbitMQ("messaging")
     .WithLifetime(ContainerLifetime.Persistent);
@@ -13,7 +15,6 @@ var keycloak = builder.AddKeycloak("keycloak", port: 50717)
     .WithOtlpExporter()
     .WithLifetime(ContainerLifetime.Persistent);
 
-
 var walletApi = builder.AddProject<Projects.Tessera_Wallet_Api>("wallet-api")
     .WithReference(walletDb)
     .WithReference(rabbitmq)
@@ -21,6 +22,22 @@ var walletApi = builder.AddProject<Projects.Tessera_Wallet_Api>("wallet-api")
     .WaitFor(walletDb)
     .WaitFor(rabbitmq)
     .WaitFor(keycloak);
+
+builder.AddProject<Projects.Tessera_Orchestrator>("orchestrator")
+    .WithReference(orchestratordb)
+    .WithReference(rabbitmq)
+    .WaitFor(orchestratordb)
+    .WaitFor(rabbitmq);
+
+builder.AddProject<Projects.Tessera_History_Api>("history-api")
+    .WithReference(historyDb)
+    .WithReference(rabbitmq)
+    .WaitFor(historyDb)
+    .WaitFor(rabbitmq);
+
+builder.AddProject<Projects.Tessera_Notifications>("notifications")
+    .WithReference(rabbitmq)
+    .WaitFor(rabbitmq);
 
 builder.AddProject<Projects.Tessera_Gateway>("gateway")
     .WithReference(walletApi)

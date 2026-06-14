@@ -4,7 +4,11 @@
     <Project Path="src/Tessera.Gateway/Tessera.Gateway.csproj" />
     <Project Path="src/Tessera.ServiceDefaults/Tessera.ServiceDefaults.csproj" />
   </Folder>
-  <Folder Name="/src/Services/" />
+  <Folder Name="/src/Services/">
+    <Project Path="src/Services/Tessera.History.Api/Tessera.History.Api.csproj" Id="26efc62e-b72a-4229-a45f-f1e0383f9b1d" />
+    <Project Path="src/Services/Tessera.Notifications/Tessera.Notifications.csproj" Id="d985fa0e-1236-4c1f-b89b-bfb43f86f7d2" />
+    <Project Path="src/Services/Tessera.Orchestrator/Tessera.Orchestrator.csproj" Id="7c2ffe5a-ac1a-4bc2-9466-4deff9f198f5" />
+  </Folder>
   <Folder Name="/src/Services/Wallet/">
     <Project Path="src/Services/Wallet/Tessera.Wallet.Api/Tessera.Wallet.Api.csproj" />
   </Folder>

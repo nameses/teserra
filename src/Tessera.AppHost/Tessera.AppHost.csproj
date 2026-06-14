@@ -17,6 +17,9 @@
   <ItemGroup>
     <ProjectReference Include="..\Services\Wallet\Tessera.Wallet.Api\Tessera.Wallet.Api.csproj" />
     <ProjectReference Include="..\Tessera.Gateway\Tessera.Gateway.csproj" />
+    <ProjectReference Include="..\Services\Tessera.Orchestrator\Tessera.Orchestrator.csproj" />
+    <ProjectReference Include="..\Services\Tessera.History.Api\Tessera.History.Api.csproj" />
+    <ProjectReference Include="..\Services\Tessera.Notifications\Tessera.Notifications.csproj" />
   </ItemGroup>
 
 </Project>
