@@ -8,15 +8,14 @@ public record RefundBetCommand(Guid RoundId, Guid PlayerId, decimal Amount);
 
 //events
 public record BetPlacedEvent(Guid RoundId, Guid PlayerId, string GameType, decimal Stake, string GameDetails);
-public record FundsReservedEvent(Guid RoundId, Guid PlayerId, decimal Amount, decimal Balance);
-public record FundsReservationRejectedEvent(Guid RoundId, Guid PlayerId, string Reason, decimal Balance);
+public abstract record FundsReservationEvent;
+public record FundsReservedEvent(Guid RoundId, Guid PlayerId, decimal Amount, decimal Balance) : FundsReservationEvent;
+public record FundsReservationRejectedEvent(Guid RoundId, Guid PlayerId, string Reason, decimal Balance) : FundsReservationEvent;
 public record RoundPlayedEvent(Guid RoundId, string Outcome, decimal Payout);
 public record BetFailedEvent(Guid RoundId, Guid PlayerId, string Reason, decimal Balance);
 public record BetSettledEvent(Guid RoundId, Guid PlayerId, string Status, string Outcome, decimal Payout, decimal Balance);
 public record PayoutCreditedEvent(Guid RoundId, Guid PlayerId, decimal Amount, decimal Balance);
 public record BetRefundedEvent(Guid RoundId, Guid PlayerId, decimal Amount, decimal Balance);
-
-
 
 //timeout
 public record RoundTimeout(Guid RoundId);

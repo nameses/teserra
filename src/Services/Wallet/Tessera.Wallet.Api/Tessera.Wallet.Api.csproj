@@ -10,6 +10,9 @@
     <PackageReference Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" />
     <PackageReference Include="EFCore.NamingConventions" />
     <PackageReference Include="Grpc.AspNetCore" />
+    <PackageReference Include="MassTransit" />
+    <PackageReference Include="MassTransit.EntityFrameworkCore" />
+    <PackageReference Include="MassTransit.RabbitMQ" />
     <PackageReference Include="MediatR" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
@@ -21,6 +24,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Tessera.ServiceDefaults\Tessera.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\..\..\Shared\Tessera.Contracts\Tessera.Contracts.csproj" />
   </ItemGroup>
 
   <ItemGroup>

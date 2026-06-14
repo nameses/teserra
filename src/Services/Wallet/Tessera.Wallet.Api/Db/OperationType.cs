@@ -2,5 +2,9 @@
 
 public enum OperationType
 {
-    Deposit, Withdrawal, BetStake, BetPayout, Refund
+    Deposit, 
+    Withdrawal, 
+    BetStake, 
+    BetPayout, 
+    Refund
 }

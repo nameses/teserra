@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using MassTransit;
+using Microsoft.EntityFrameworkCore;
 
 namespace Tessera.Wallet.Api.Db;
 
@@ -11,6 +12,10 @@ public class WalletDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder b)
     {
+        b.AddInboxStateEntity();
+        b.AddOutboxMessageEntity();
+        b.AddOutboxStateEntity();
+
         b.Entity<Wallet>(e =>
         {
             e.HasKey(w => w.Id);

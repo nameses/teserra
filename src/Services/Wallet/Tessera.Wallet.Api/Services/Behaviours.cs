@@ -46,6 +46,9 @@ public class TransactionBehavior<TReq, TRes> : IPipelineBehavior<TReq, TRes> whe
 
     public async Task<TRes> Handle(TReq req, RequestHandlerDelegate<TRes> next, CancellationToken ct)
     {
+        if (_db.Database.CurrentTransaction is not null)
+            return await next();
+
         return await Retry.ExecuteAsync(async token =>
         {
             var strategy = _db.Database.CreateExecutionStrategy();
