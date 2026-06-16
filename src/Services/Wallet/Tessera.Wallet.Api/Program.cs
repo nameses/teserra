@@ -1,11 +1,6 @@
-using MassTransit;
-
 using Microsoft.EntityFrameworkCore;
-
 using Serilog;
-
 using Tessera.Wallet.Api;
-using Tessera.Wallet.Api.Consumers;
 using Tessera.Wallet.Api.Db;
 using Tessera.Wallet.Api.Repos;
 using Tessera.Wallet.Api.Services;
@@ -44,24 +39,7 @@ builder.Services.AddScalar(scalarSettings);
 
 builder.Services.AddGrpc();
 
-builder.Services.AddMassTransit(x =>
-{
-    x.AddConsumer<ReserveFundsConsumer>();
-    x.AddConsumer<SettleBetConsumer>();
-    x.AddConsumer<RefundBetConsumer>();
-
-    x.AddEntityFrameworkOutbox<WalletDbContext>(o =>
-    {
-        o.UsePostgres();
-        o.UseBusOutbox();
-    });
-
-    x.UsingRabbitMq((ctx, cfg) =>
-    {
-        cfg.Host(builder.Configuration.GetConnectionString("messaging"));
-        cfg.ConfigureEndpoints(ctx);
-    });
-});
+builder.Services.AddMassTransitConfiguration(builder.Configuration.GetConnectionString("messaging"));
 
 var app = builder.Build();
 app.UseSerilogRequestLogging();
