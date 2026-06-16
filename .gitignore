@@ -484,3 +484,5 @@ $RECYCLE.BIN/
 /src/Services/Wallet/Tessera.Wallet.Api/appsettings.json
 /src/Services/Wallet/Tessera.Wallet.Api/appsettings.Development.json
 /src/Services/Wallet/Tessera.Wallet.Api/Migrations
+/src/Services/Tessera.History.Api/appsettings.json
+/src/Services/Tessera.History.Api/appsettings.Development.json

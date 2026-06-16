@@ -1,4 +1,4 @@
-﻿namespace Tessera.Wallet.Api.Services;
+﻿namespace Tessera.Wallet.Api.Services.CommonModels;
 
 public class ApplicationSettings
 {

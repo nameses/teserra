@@ -1,20 +1,20 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.OpenApi;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi;
 using Scalar.AspNetCore;
 
-namespace Tessera.Wallet.Api.Services;
+namespace Microsoft.Extensions.Hosting;
 
-internal static class ScalarExtensions
+public static class ScalarExtensions
 {
-    internal static IServiceCollection AddScalar(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddScalar(this IServiceCollection services, ScalarSettings settings)
     {
-        var application = configuration.Get<ApplicationSettings>();
-
         services.AddOpenApi(options =>
         {
             options.OpenApiVersion = OpenApiSpecVersion.OpenApi3_0;
-            options.UseOAuth2Authentication(application!);
+            options.UseOAuth2Authentication(settings);
 
             options.AddDocumentTransformer((document, context, ct) =>
             {
@@ -31,7 +31,7 @@ internal static class ScalarExtensions
         return services;
     }
 
-    private static OpenApiOptions UseOAuth2Authentication(this OpenApiOptions options, ApplicationSettings application)
+    private static OpenApiOptions UseOAuth2Authentication(this OpenApiOptions options, ScalarSettings settings)
     {
         var scheme = new OpenApiSecurityScheme
         {
@@ -41,7 +41,7 @@ internal static class ScalarExtensions
             {
                 Implicit = new OpenApiOAuthFlow
                 {
-                    AuthorizationUrl = new Uri(application.Scalar.Security.AuthorizationUrl),
+                    AuthorizationUrl = new Uri(settings.AuthorizationUrl),
                     Scopes = new Dictionary<string, string>
                     {
                         { "openid", "openid" },
@@ -78,10 +78,8 @@ internal static class ScalarExtensions
         return options;
     }
 
-    internal static WebApplication ConfigureScalar(this WebApplication app)
+    public static WebApplication ConfigureScalar(this WebApplication app, ScalarSettings settings)
     {
-        var application = app.Configuration.Get<ApplicationSettings>();
-
         app.MapOpenApi();
 
         app.MapScalarApiReference(options =>
@@ -95,12 +93,19 @@ internal static class ScalarExtensions
             options
                 .AddImplicitFlow("OAuth2", flow =>
                 {
-                    flow.ClientId = application!.Scalar.Security.ClientId;
-                    flow.AuthorizationUrl = application.Scalar.Security.AuthorizationUrl;
+                    flow.ClientId = settings.ClientId;
+                    flow.AuthorizationUrl = settings.AuthorizationUrl;
                 })
                 .AddDefaultScopes("OAuth2", ["openid", "profile", "wallet.api"]);
         });
 
         return app;
+    }
+
+    public class ScalarSettings
+    {
+        public required string AuthorizationUrl { get; set; }
+        public required string ClientId { get; set; }
+        public required string Audience { get; set; }
     }
 }

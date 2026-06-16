@@ -9,10 +9,16 @@ using Tessera.Wallet.Api.Consumers;
 using Tessera.Wallet.Api.Db;
 using Tessera.Wallet.Api.Repos;
 using Tessera.Wallet.Api.Services;
+using Tessera.Wallet.Api.Services.CommonModels;
 
 var builder = WebApplication.CreateBuilder(args);
 var settings = builder.Configuration.Get<ApplicationSettings>();
-Console.WriteLine($"AUDIENCE = '{settings?.Authorization?.Audience}'");
+var scalarSettings = new ScalarExtensions.ScalarSettings() 
+{ 
+    Audience = settings!.Authorization.Audience, 
+    AuthorizationUrl = settings!.Scalar.Security.AuthorizationUrl, 
+    ClientId = settings!.Scalar.Security.ClientId
+};
 
 builder.AddServiceDefaults();
 builder.Services.AddProblemDetails();
@@ -34,7 +40,7 @@ builder.Services.AddTransient<IWalletRepository, WalletRepository>();
 builder.AddKeycloakAuth(settings!.Authorization.Audience);
 builder.Services.AddAuthorization();
 
-builder.Services.AddScalar(builder.Configuration);
+builder.Services.AddScalar(scalarSettings);
 
 builder.Services.AddGrpc();
 
@@ -65,7 +71,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapDefaultEndpoints();
-app.ConfigureScalar();
+app.ConfigureScalar(scalarSettings);
 app.MapApiEndpoints();
 app.MapGrpcService<WalletGrpcService>();
 
@@ -76,3 +82,4 @@ if (app.Environment.IsDevelopment())
     await db.Database.MigrateAsync();
 }
 app.Run();
+
