@@ -1,5 +1,4 @@
 ﻿using System.Linq.Expressions;
-
 using Tessera.History.Api.Db;
 using Tessera.History.Api.DTOs.Common;
 
@@ -10,6 +9,7 @@ internal static class BetDetailsResponseHelpers
     public static readonly Expression<Func<BetDetail, BetDetailsResponse>> ToResponse =
         bet => new BetDetailsResponse
         {
+            RoundId = bet.RoundId,
             Payout = bet.Payout,
             BalanceAfter = bet.BalanceAfter,
             FailedReason = bet.FailedReason,

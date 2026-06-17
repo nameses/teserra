@@ -5,6 +5,8 @@ namespace Tessera.History.Api.DTOs;
 
 public class BetDetailsResponse
 {
+    public Guid RoundId { get; set; 
+    }
     public decimal Stake { get; set; }
     public decimal Payout { get; set; }
     public decimal BalanceAfter { get; set; }

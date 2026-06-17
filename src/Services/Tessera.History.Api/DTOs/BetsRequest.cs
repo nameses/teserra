@@ -7,12 +7,12 @@ public class BetsRequest
     public int Size { get; set; }
     //filters
     public string? GameType { get; set; }
-    public decimal? ScoreFrom { get; set; }
-    public decimal? ScoreTo { get; set; }
+    public decimal? StakeFrom { get; set; }
+    public decimal? StakeTo { get; set; }
     public decimal? PayoutFrom { get; set; }
     public decimal? PayoutTo { get; set; }
     
-    public BetStatus BetStatus { get; set; }
+    public BetStatus? BetStatus { get; set; }
     public SortDirection SortDirection { get; set; }
 
     /// <summary>

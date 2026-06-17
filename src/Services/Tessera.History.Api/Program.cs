@@ -3,6 +3,7 @@ using Serilog;
 using Tessera.History.Api.Db;
 using Microsoft.EntityFrameworkCore;
 using Tessera.History.Api.Services.CommonModels;
+using Tessera.History.Api.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 var settings = builder.Configuration.Get<ApplicationSettings>();
