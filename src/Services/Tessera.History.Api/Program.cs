@@ -4,6 +4,7 @@ using Tessera.History.Api.Db;
 using Microsoft.EntityFrameworkCore;
 using Tessera.History.Api.Services.CommonModels;
 using Tessera.History.Api.Repositories;
+using Tessera.History.Api;
 
 var builder = WebApplication.CreateBuilder(args);
 var settings = builder.Configuration.Get<ApplicationSettings>();
@@ -27,8 +28,6 @@ builder.EnrichNpgsqlDbContext<HistoryApiDbContext>();
 builder.Services.AddMediatR(cfg =>
 {
     cfg.RegisterServicesFromAssembly(typeof(Program).Assembly);
-    //cfg.AddOpenBehavior(typeof(LoggingBehavior<,>));
-    //cfg.AddOpenBehavior(typeof(TransactionBehavior<,>));
 });
 
 builder.Services.AddTransient<IBetsRepository, BetsRepository>();
@@ -66,6 +65,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapDefaultEndpoints();
+app.MapApiEndpoints();
 
 if (app.Environment.IsDevelopment())
 {
