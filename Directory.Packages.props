@@ -3,6 +3,7 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
   <ItemGroup>
+    <PackageVersion Include="AppAny.Quartz.EntityFrameworkCore.Migrations.PostgreSQL" Version="0.6.0" />
     <PackageVersion Include="Aspire.Keycloak.Authentication" Version="13.4.2-preview.1.26303.6" />
     <PackageVersion Include="Aspire.Hosting.Keycloak" Version="13.4.2-preview.1.26303.6" />
     <PackageVersion Include="Aspire.Hosting.PostgreSQL" Version="13.4.5" />

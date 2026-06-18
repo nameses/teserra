@@ -489,3 +489,7 @@ $RECYCLE.BIN/
 /src/Services/Tessera.Orchestrator/Migrations/20260618191356_v1.cs
 /src/Services/Tessera.Orchestrator/Migrations/OrchestratorDbContextModelSnapshot.cs
 /src/Services/Tessera.Orchestrator/Migrations/20260618191356_v1.Designer.cs
+/src/Services/Tessera.Orchestrator/Migrations/20260618195923_v1.cs
+/src/Services/Tessera.Orchestrator/Migrations/20260618195923_v1.Designer.cs
+/src/Services/Tessera.Orchestrator/Migrations/20260618201915_v2.cs
+/src/Services/Tessera.Orchestrator/Migrations/20260618201915_v2.Designer.cs

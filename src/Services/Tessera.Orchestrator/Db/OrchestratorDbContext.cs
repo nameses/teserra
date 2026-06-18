@@ -1,4 +1,6 @@
-﻿using MassTransit;
+﻿using AppAny.Quartz.EntityFrameworkCore.Migrations;
+using AppAny.Quartz.EntityFrameworkCore.Migrations.PostgreSQL;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 
 namespace Tessera.Orchestrator.Db;
@@ -11,13 +13,15 @@ public class OrchestratorDbContext : DbContext
 
     public DbSet<BetState> BetStates { get; set; }
 
-    protected override void OnModelCreating(ModelBuilder b)
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        b.AddInboxStateEntity();
-        b.AddOutboxMessageEntity();
-        b.AddOutboxStateEntity();
+        modelBuilder.AddQuartz(b => b.UsePostgreSql());
 
-        b.Entity<BetState>(e =>
+        modelBuilder.AddInboxStateEntity();
+        modelBuilder.AddOutboxMessageEntity();
+        modelBuilder.AddOutboxStateEntity();
+
+        modelBuilder.Entity<BetState>(e =>
         {
             e.HasKey(w => w.CorrelationId);
             e.Property(w => w.Balance).HasPrecision(19, 4);

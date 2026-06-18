@@ -30,6 +30,7 @@ builder.Services.AddQuartz(q =>
         s.UseProperties = true;
         s.UsePostgres(builder.Configuration.GetConnectionString("orchestratordb")!);
         s.UseSystemTextJsonSerializer();
+        s.SetProperty("quartz.jobStore.tablePrefix", "quartz.QRTZ_");
     });
 });
 builder.Services.AddQuartzHostedService(o => o.WaitForJobsToComplete = true);
