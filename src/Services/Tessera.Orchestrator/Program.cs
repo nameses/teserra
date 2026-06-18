@@ -5,8 +5,16 @@ using Tessera.Contracts.Betting;
 using Tessera.Orchestrator;
 using Tessera.Orchestrator.Db;
 using Tessera.Orchestrator.Services;
+using Tessera.Orchestrator.Services.CommonModels;
 
 var builder = WebApplication.CreateBuilder(args);
+var settings = builder.Configuration.Get<ApplicationSettings>();
+var scalarSettings = new Extensions.ScalarSettings()
+{
+    Audience = settings!.Authorization.Audience,
+    AuthorizationUrl = settings!.Scalar.Security.AuthorizationUrl,
+    ClientId = settings!.Scalar.Security.ClientId
+};
 
 builder.AddServiceDefaults();
 builder.Services.AddProblemDetails();
@@ -16,8 +24,10 @@ builder.Services.AddDbContextPool<OrchestratorDbContext>((sp, opt) =>
        .UseSnakeCaseNamingConvention());
 builder.EnrichNpgsqlDbContext<OrchestratorDbContext>();
 
-builder.AddKeycloakAuth(builder.Configuration["Authorization:Audience"]!); 
+builder.AddKeycloakAuth(scalarSettings.Audience); 
 builder.Services.AddAuthorization();
+
+builder.Services.AddScalar(scalarSettings);
 
 EndpointConvention.Map<ReserveFundsCommand>(new Uri("queue:reserve-funds"));
 EndpointConvention.Map<SettleBetCommand>(new Uri("queue:settle-bet"));
@@ -62,6 +72,8 @@ builder.Services.AddMassTransit(config =>
 });
 
 var app = builder.Build();
+
+app.ConfigureScalar(scalarSettings);
 
 app.UseHttpsRedirection();
 app.UseAuthentication();
