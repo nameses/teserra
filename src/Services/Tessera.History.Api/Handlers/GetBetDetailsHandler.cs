@@ -1,5 +1,4 @@
 ﻿using MediatR;
-
 using Tessera.History.Api.DTOs;
 using Tessera.History.Api.Repositories;
 

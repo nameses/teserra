@@ -9,7 +9,7 @@ namespace Tessera.History.Api.Repositories;
 public interface IBetsRepository
 {
     public Task<BetDetailsResponse?> GetAsync(Guid roundId, Guid playerId, CancellationToken cancellationToken);
-    public Task<BetsResponse> GetAsync(BetsRequest request, Guid playerId, CancellationToken cancellationToken);
+    public Task<BetsResponse> GetBulkAsync(BetsRequest request, Guid playerId, CancellationToken cancellationToken);
 }
 
 public class BetsRepository : IBetsRepository
@@ -30,7 +30,7 @@ public class BetsRepository : IBetsRepository
         return bet;
     }
 
-    public async Task<BetsResponse> GetAsync(BetsRequest request, Guid playerId, CancellationToken cancellationToken)
+    public async Task<BetsResponse> GetBulkAsync(BetsRequest request, Guid playerId, CancellationToken cancellationToken)
     {
         var betsCommand = _db.BetDetails.Where(b => b.PlayerId == playerId && b.PlacedAt != null);
         var cursor = BetCursor.Decode(request.Cursor, request.SortDirection);
