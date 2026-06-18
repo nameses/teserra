@@ -9,7 +9,7 @@ using Tessera.History.Api.Consumers;
 
 var builder = WebApplication.CreateBuilder(args);
 var settings = builder.Configuration.Get<ApplicationSettings>();
-var scalarSettings = new ScalarExtensions.ScalarSettings()
+var scalarSettings = new Extensions.ScalarSettings()
 {
     Audience = settings!.Authorization.Audience,
     AuthorizationUrl = settings!.Scalar.Security.AuthorizationUrl,
