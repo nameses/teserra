@@ -490,3 +490,5 @@ $RECYCLE.BIN/
 /src/Services/Tessera.Orchestrator/appsettings.Development.json
 /src/Services/Tessera.Orchestrator/appsettings.json
 /PROJECT_SPECIFICATIONS.md
+/src/Tessera.Gateway/appsettings.json
+/src/Tessera.Gateway/appsettings.Development.json

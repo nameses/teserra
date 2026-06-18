@@ -158,7 +158,7 @@ public static class Extensions
         return builder;
     }
 
-    public static IServiceCollection AddScalar(this IServiceCollection services, ScalarSettings settings)
+    public static IServiceCollection AddScalar(this IServiceCollection services, DocumentationSettings settings)
     {
         services.AddOpenApi(options =>
         {
@@ -169,8 +169,8 @@ public static class Extensions
             {
                 document.Info = new OpenApiInfo
                 {
-                    Title = "Tessera Wallet API",
-                    Version = "v1"//todo add versioning later
+                    Title = settings.Title,
+                    Version = settings.Version //todo add versioning later
                 };
 
                 return Task.CompletedTask;
@@ -180,7 +180,7 @@ public static class Extensions
         return services;
     }
 
-    private static OpenApiOptions UseOAuth2Authentication(this OpenApiOptions options, ScalarSettings settings)
+    private static OpenApiOptions UseOAuth2Authentication(this OpenApiOptions options, DocumentationSettings settings)
     {
         var scheme = new OpenApiSecurityScheme
         {
@@ -227,7 +227,7 @@ public static class Extensions
         return options;
     }
 
-    public static WebApplication ConfigureScalar(this WebApplication app, ScalarSettings settings)
+    public static WebApplication ConfigureScalar(this WebApplication app, DocumentationSettings settings)
     {
         app.MapOpenApi();
 
@@ -251,10 +251,13 @@ public static class Extensions
         return app;
     }
 
-    public class ScalarSettings
+    public class DocumentationSettings
     {
         public required string AuthorizationUrl { get; set; }
         public required string ClientId { get; set; }
         public required string Audience { get; set; }
+
+        public required string Title { get; set; }
+        public required string Version { get; set; }
     }
 }

@@ -4,6 +4,7 @@ public class ApplicationSettings
 {
     public ScalarSettings Scalar { get; set; } = new();
     public AuthorizationSettings Authorization { get; set;} = new();
+    public DocsSettings Docs { get; set;} = new();
 }
 
 public class AuthorizationSettings
@@ -20,4 +21,10 @@ public class SecuritySettings
 {
     public string AuthorizationUrl { get; set; } = string.Empty;
     public string ClientId { get; set; } = string.Empty;
+}
+
+public class DocsSettings
+{
+    public string Title { get; set; } = string.Empty;
+    public string Version { get; set; } = string.Empty;
 }

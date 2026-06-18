@@ -9,11 +9,13 @@ using Tessera.Orchestrator.Services.CommonModels;
 
 var builder = WebApplication.CreateBuilder(args);
 var settings = builder.Configuration.Get<ApplicationSettings>();
-var scalarSettings = new Extensions.ScalarSettings()
+var scalarSettings = new Extensions.DocumentationSettings()
 {
     Audience = settings!.Authorization.Audience,
     AuthorizationUrl = settings!.Scalar.Security.AuthorizationUrl,
-    ClientId = settings!.Scalar.Security.ClientId
+    ClientId = settings!.Scalar.Security.ClientId,
+    Title = settings!.Docs.Title,
+    Version = settings!.Docs.Version,
 };
 
 builder.AddServiceDefaults();
