@@ -10,6 +10,7 @@ public interface IBetsRepository
 {
     public Task<BetDetailsResponse?> GetAsync(Guid roundId, Guid playerId, CancellationToken cancellationToken);
     public Task<BetsResponse> GetBulkAsync(BetsRequest request, Guid playerId, CancellationToken cancellationToken);
+    public Task<BetDetail> UpsertAsync(Guid roundId, Guid playerId, Action<BetDetail> mutate, CancellationToken cancellationToken);
 }
 
 public class BetsRepository : IBetsRepository
@@ -95,5 +96,20 @@ public class BetsRepository : IBetsRepository
             : null;
 
         return new BetsResponse(bets, nextCursor);
+    }
+
+    public async Task<BetDetail> UpsertAsync(Guid roundId, Guid playerId, Action<BetDetail> mutate, CancellationToken cancellationToken)
+    {
+        var bet = await _db.BetDetails.FirstOrDefaultAsync(x => x.RoundId == roundId && x.PlayerId == playerId, cancellationToken);
+
+        if(bet == null)
+        {
+            bet = new BetDetail() { RoundId = roundId, PlayerId = playerId };
+            _db.BetDetails.Add(bet);
+        }
+
+        mutate(bet);
+        await _db.SaveChangesAsync(cancellationToken);
+        return bet;
     }
 }

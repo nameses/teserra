@@ -16,6 +16,7 @@ internal static class BetDetailsResponseHelpers
             GameType = bet.GameType,
             Stake = bet.Stake,
             PlacedAt = bet.PlacedAt,
+            Outcome = bet.Outcome,
             BetStatus = bet.FailedAt != null
                 ? BetStatus.Refunded
                 : bet.SettledAt != null ? BetStatus.Settled : BetStatus.Placed

@@ -10,6 +10,7 @@ public class BetDetailsResponse
     public decimal Payout { get; set; }
     public decimal BalanceAfter { get; set; }
     public string? GameType { get; set; }
+    public string? Outcome { get; set; }
     public DateTime? PlacedAt { get; set; }
 
     public BetStatus BetStatus { get; set; }

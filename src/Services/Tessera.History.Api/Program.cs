@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Tessera.History.Api.Services.CommonModels;
 using Tessera.History.Api.Repositories;
 using Tessera.History.Api;
+using Tessera.History.Api.Consumers;
 
 var builder = WebApplication.CreateBuilder(args);
 var settings = builder.Configuration.Get<ApplicationSettings>();
@@ -39,11 +40,14 @@ builder.Services.AddScalar(scalarSettings);
 
 builder.Services.AddMassTransit(x =>
 {
-    //x.AddConsumer<ReserveFundsConsumer>();
+    x.AddConsumer<BetPlacedConsumer>();
+    x.AddConsumer<BetSettledConsumer>();
+    x.AddConsumer<BetFailedConsumer>();
 
     x.UsingRabbitMq((ctx, cfg) =>
     {
-        cfg.Host(builder.Configuration.GetConnectionString("messaging"));
+        cfg.Host("messaging");
+        cfg.UseMessageRetry(r => r.Immediate(3));
         cfg.ConfigureEndpoints(ctx);
     });
 });
