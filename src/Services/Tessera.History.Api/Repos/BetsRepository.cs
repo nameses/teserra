@@ -32,18 +32,20 @@ public class BetsRepository : IBetsRepository
 
     public async Task<BetsResponse> GetBulkAsync(BetsRequest request, Guid playerId, CancellationToken cancellationToken)
     {
+        var size = Math.Clamp(request.Size, 1, 100);
+
         var betsCommand = _db.BetDetails.Where(b => b.PlayerId == playerId && b.PlacedAt != null);
         var cursor = BetCursor.Decode(request.Cursor, request.SortDirection);
 
-        if (request.PayoutFrom != 0)
-            betsCommand = betsCommand.Where(b => b.Payout >= request.PayoutFrom);
-        if (request.PayoutTo != 0)
-            betsCommand = betsCommand.Where(b => b.Payout <= request.PayoutTo);
+        if (request.PayoutFrom is { } pf)
+            betsCommand = betsCommand.Where(b => b.Payout >= pf);
+        if (request.PayoutTo is { } pt)
+            betsCommand = betsCommand.Where(b => b.Payout <= pt);
 
-        if (request.StakeFrom != 0)
-            betsCommand = betsCommand.Where(b => b.Stake >= request.StakeFrom);
-        if (request.StakeTo != 0)
-            betsCommand = betsCommand.Where(b => b.Stake <= request.StakeTo);
+        if (request.StakeFrom is { } sf)
+            betsCommand = betsCommand.Where(b => b.Stake >= sf);
+        if (request.StakeTo is { } st)
+            betsCommand = betsCommand.Where(b => b.Stake <= st);
 
         if (!string.IsNullOrEmpty(request.GameType))
             betsCommand = betsCommand.Where(b => b.GameType == request.GameType);
@@ -81,11 +83,11 @@ public class BetsRepository : IBetsRepository
         }
 
         var bets = await betsCommand
-            .Take(request.Size + 1)
+            .Take(size + 1)
             .Select(BetDetailsResponseHelpers.ToResponse)
             .ToListAsync(cancellationToken);
 
-        var hasMore = bets.Count > request.Size;
+        var hasMore = bets.Count > size;
         if (hasMore) bets.RemoveAt(bets.Count - 1);
 
         var nextCursor = hasMore
