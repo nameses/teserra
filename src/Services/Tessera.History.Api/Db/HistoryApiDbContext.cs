@@ -1,4 +1,7 @@
-﻿using MassTransit;
+﻿using System.Reflection.Emit;
+
+using MassTransit;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -10,17 +13,11 @@ public class HistoryApiDbContext : DbContext
 
     public DbSet<BetDetail> BetDetails => Set<BetDetail>();
 
-    protected override void OnModelCreating(ModelBuilder b)
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        b.AddInboxStateEntity();
+        modelBuilder.AddInboxStateEntity();
 
-        b.Entity<BetDetail>(e =>
-        {
-            e.HasKey(w => w.RoundId);
-            e.Property(w => w.BalanceAfter).HasPrecision(19, 4);
-            e.Property(w => w.Stake).HasPrecision(19, 4);
-            e.Property(w => w.Payout).HasPrecision(19, 4);
-        });
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(HistoryApiDbContext).Assembly);
     }
 }
 
@@ -28,6 +25,11 @@ public sealed class BetDetailConfig : IEntityTypeConfiguration<BetDetail>
 {
     public void Configure(EntityTypeBuilder<BetDetail> b)
     {
+        b.HasKey(w => w.RoundId);
+        b.Property(w => w.BalanceAfter).HasPrecision(19, 4);
+        b.Property(w => w.Stake).HasPrecision(19, 4);
+        b.Property(w => w.Payout).HasPrecision(19, 4);
+
         b.ToTable("bet_history");
         b.HasKey(x => x.RoundId);
 

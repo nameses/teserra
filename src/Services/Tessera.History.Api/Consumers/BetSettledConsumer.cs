@@ -17,7 +17,7 @@ public class BetSettledConsumer(IBetsRepository repo) : IConsumer<BetSettledEven
                 bet.Payout = m.Payout;
                 bet.Outcome = m.Outcome;
                 bet.BalanceAfter = m.Balance;
-                bet.FailedAt = DateTime.UtcNow;
+                bet.SettledAt = DateTime.UtcNow;
             },
             ctx.CancellationToken);
     }

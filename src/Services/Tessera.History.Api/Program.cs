@@ -44,6 +44,11 @@ builder.Services.AddMassTransit(x =>
     x.AddConsumer<BetSettledConsumer>();
     x.AddConsumer<BetFailedConsumer>();
 
+    x.AddEntityFrameworkOutbox<HistoryApiDbContext>(o =>
+    {
+        o.UsePostgres();
+    });
+
     x.UsingRabbitMq((ctx, cfg) =>
     {
         cfg.Host(builder.Configuration.GetConnectionString("messaging"));
