@@ -160,7 +160,7 @@ public static class Extensions
 
     public static IServiceCollection AddScalar(this IServiceCollection services, DocumentationSettings settings)
     {
-        services.AddOpenApi(options =>
+        services.AddOpenApi(settings.Version, options =>
         {
             options.OpenApiVersion = OpenApiSpecVersion.OpenApi3_0;
             options.UseOAuth2Authentication(settings);
@@ -172,6 +172,8 @@ public static class Extensions
                     Title = settings.Title,
                     Version = settings.Version //todo add versioning later
                 };
+
+                document.Servers = [];
 
                 return Task.CompletedTask;
             });

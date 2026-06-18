@@ -18,8 +18,6 @@ var scalarSettings = new Extensions.DocumentationSettings()
     Version = settings!.Docs.Version,
 };
 
-builder.Services.AddOpenApi();
-
 builder.AddServiceDefaults();
 builder.Services.AddProblemDetails();
 
@@ -60,12 +58,6 @@ builder.Services.AddMassTransit(x =>
 });
 
 var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
 
 app.ConfigureScalar(scalarSettings);
 

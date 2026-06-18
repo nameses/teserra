@@ -23,24 +23,37 @@ var walletApi = builder.AddProject<Projects.Tessera_Wallet_Api>("wallet-api")
     .WaitFor(rabbitmq)
     .WaitFor(keycloak);
 
-builder.AddProject<Projects.Tessera_Orchestrator>("orchestrator")
+var orchestrator = builder.AddProject<Projects.Tessera_Orchestrator>("orchestrator")
     .WithReference(orchestratordb)
     .WithReference(rabbitmq)
+    .WithReference(keycloak)
     .WaitFor(orchestratordb)
-    .WaitFor(rabbitmq);
+    .WaitFor(rabbitmq)
+    .WaitFor(keycloak);
 
-builder.AddProject<Projects.Tessera_History_Api>("history-api")
+var historyApi = builder.AddProject<Projects.Tessera_History_Api>("history-api")
     .WithReference(historyDb)
     .WithReference(rabbitmq)
+    .WithReference(keycloak)
     .WaitFor(historyDb)
-    .WaitFor(rabbitmq);
+    .WaitFor(rabbitmq)
+    .WaitFor(keycloak);
 
-builder.AddProject<Projects.Tessera_Notifications>("notifications")
+var notifications = builder.AddProject<Projects.Tessera_Notifications>("notifications")
     .WithReference(rabbitmq)
-    .WaitFor(rabbitmq);
+    .WithReference(keycloak)
+    .WaitFor(rabbitmq)
+    .WaitFor(keycloak);
 
 builder.AddProject<Projects.Tessera_Gateway>("gateway")
     .WithReference(walletApi)
+    .WithReference(orchestrator)
+    .WithReference(historyApi)
+    .WithReference(notifications)
+    .WaitFor(walletApi)
+    .WaitFor(orchestrator)
+    .WaitFor(historyApi)
+    .WaitFor(notifications)
     .WithExternalHttpEndpoints();
 
 builder.Build().Run();
