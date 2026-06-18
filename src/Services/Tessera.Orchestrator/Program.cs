@@ -1,9 +1,6 @@
 using MassTransit;
-
 using Microsoft.EntityFrameworkCore;
-
 using Quartz;
-
 using Tessera.Contracts.Betting;
 using Tessera.Orchestrator;
 using Tessera.Orchestrator.Db;
@@ -32,6 +29,7 @@ builder.Services.AddQuartz(q =>
     {
         s.UseProperties = true;
         s.UsePostgres(builder.Configuration.GetConnectionString("orchestratordb")!);
+        s.UseSystemTextJsonSerializer();
     });
 });
 builder.Services.AddQuartzHostedService(o => o.WaitForJobsToComplete = true);

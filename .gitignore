@@ -486,3 +486,6 @@ $RECYCLE.BIN/
 /src/Services/Wallet/Tessera.Wallet.Api/Migrations
 /src/Services/Tessera.History.Api/appsettings.json
 /src/Services/Tessera.History.Api/appsettings.Development.json
+/src/Services/Tessera.Orchestrator/Migrations/20260618191356_v1.cs
+/src/Services/Tessera.Orchestrator/Migrations/OrchestratorDbContextModelSnapshot.cs
+/src/Services/Tessera.Orchestrator/Migrations/20260618191356_v1.Designer.cs
