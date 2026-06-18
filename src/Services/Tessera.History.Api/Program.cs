@@ -46,7 +46,7 @@ builder.Services.AddMassTransit(x =>
 
     x.UsingRabbitMq((ctx, cfg) =>
     {
-        cfg.Host("messaging");
+        cfg.Host(builder.Configuration.GetConnectionString("messaging"));
         cfg.UseMessageRetry(r => r.Immediate(3));
         cfg.ConfigureEndpoints(ctx);
     });
