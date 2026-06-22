@@ -1,4 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+
+using Npgsql;
+
 using Tessera.History.Api.Db;
 using Tessera.History.Api.DTOs;
 using Tessera.History.Api.DTOs.Common;
@@ -100,16 +103,24 @@ public class BetsRepository : IBetsRepository
 
     public async Task<BetDetail> UpsertAsync(Guid roundId, Guid playerId, Action<BetDetail> mutate, CancellationToken cancellationToken)
     {
-        var bet = await _db.BetDetails.FirstOrDefaultAsync(x => x.RoundId == roundId && x.PlayerId == playerId, cancellationToken);
-
-        if(bet == null)
-        {
-            bet = new BetDetail() { RoundId = roundId, PlayerId = playerId };
-            _db.BetDetails.Add(bet);
-        }
-
+        var bet = new BetDetail { RoundId = roundId, PlayerId = playerId };
         mutate(bet);
-        await _db.SaveChangesAsync(cancellationToken);
-        return bet;
+
+        try
+        {
+            _db.BetDetails.Add(bet);
+            await _db.SaveChangesAsync(cancellationToken);
+            return bet;
+        }
+        catch (DbUpdateException ex)
+            when (ex.InnerException is PostgresException { SqlState: "23505" })
+        {
+            _db.Entry(bet).State = EntityState.Detached;
+            var existing = await _db.BetDetails.FirstAsync(x => x.RoundId == roundId, cancellationToken);
+            mutate(existing);
+
+            await _db.SaveChangesAsync(cancellationToken);
+            return existing;
+        }
     }
 }
