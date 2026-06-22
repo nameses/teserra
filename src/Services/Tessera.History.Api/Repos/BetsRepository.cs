@@ -33,7 +33,7 @@ public class BetsRepository : IBetsRepository
 
     public async Task<BetsResponse> GetBulkAsync(BetsRequest request, Guid playerId, CancellationToken cancellationToken)
     {
-        var size = Math.Clamp(request.Size, 1, 100);
+        var size = Math.Clamp(request.Size, 20, 100);
 
         var betsCommand = _db.BetDetails.Where(b => b.PlayerId == playerId && b.PlacedAt != null);
         var cursor = BetCursor.Decode(request.Cursor, request.SortDirection);
