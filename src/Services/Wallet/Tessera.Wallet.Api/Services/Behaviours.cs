@@ -28,7 +28,7 @@ public class TransactionBehavior<TReq, TRes> : IPipelineBehavior<TReq, TRes> whe
         {
             ShouldHandle = new PredicateBuilder()
                 .Handle<DbUpdateConcurrencyException>()
-                .Handle<DbUpdateException>(),
+                .Handle<DbUpdateException>(),//todo possible narrowing of errors
             MaxRetryAttempts = 3,
             BackoffType = DelayBackoffType.Exponential,
             UseJitter = true,

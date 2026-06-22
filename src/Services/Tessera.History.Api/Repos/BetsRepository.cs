@@ -67,7 +67,7 @@ public class BetsRepository : IBetsRepository
             case SortDirection.Descending:
                 if (cursor is not null)
                     betsCommand = betsCommand.Where(b => b.PlacedAt < cursor.PlacedAt
-                        || (b.PlacedAt == cursor.PlacedAt && b.RoundId.CompareTo(cursor.RoundId) < 0));
+                        || (b.PlacedAt == cursor.PlacedAt && b.RoundId.CompareTo(cursor.RoundId) < 0)); //todo guid compare needs verification
 
                 betsCommand = betsCommand.OrderByDescending(b => b.PlacedAt)
                     .ThenByDescending(b => b.RoundId);
@@ -76,7 +76,7 @@ public class BetsRepository : IBetsRepository
             case SortDirection.Ascending:
                 if (cursor is not null)
                     betsCommand = betsCommand.Where(b => b.PlacedAt > cursor.PlacedAt
-                        || (b.PlacedAt == cursor.PlacedAt && b.RoundId.CompareTo(cursor.RoundId) > 0));
+                        || (b.PlacedAt == cursor.PlacedAt && b.RoundId.CompareTo(cursor.RoundId) > 0)); //todo guid compare needs verification
 
                 betsCommand = betsCommand.OrderBy(b => b.PlacedAt)
                     .ThenBy(b => b.RoundId);

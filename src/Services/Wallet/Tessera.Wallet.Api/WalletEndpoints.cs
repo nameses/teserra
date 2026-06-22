@@ -68,6 +68,11 @@ public static class WalletEndpointsExtension
             || !Guid.TryParse(hdr, out var idempotencyKey))
             return Results.BadRequest(new { error = "missing_idempotency_key" });
 
+        if(body.Amount <= 0)
+        {
+            return Results.BadRequest(new { error = "negative_amount" });
+        }
+
         var result = await mediator.Send(new WalletOperationCommand(playerId, idempotencyKey, body.Amount, operationType));
         return result switch
         {
